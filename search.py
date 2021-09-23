@@ -87,45 +87,73 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    stack = []
+    stack = util.Stack()
     visited = set()
 
-    stack.append(problem.getStartState())
+    stack.push((problem.getStartState(), []))
 
-    directions = [[]]
-    while len(stack) > 0:
-        currentNode = stack.pop()
-        currentList = directions.pop()
+    while not stack.isEmpty():
+        currentState = stack.pop()
+        currentNode, currentList = currentState
         if problem.isGoalState(currentNode):
             return currentList
-        
+
         if currentNode in visited:
             continue
-
+        
+        visited.add(currentNode)
         successors = problem.getSuccessors(currentNode)
 
         for successor in successors:
-            nextList = currentList[:]
-            nextList.append(successor[1])
-            directions.append(nextList)
-            stack.append(successor[0])
+            if successor[0] not in visited:
+                nextList = currentList[:]
+                nextList.append(successor[1])
+                stack.push((successor[0], nextList))
 
-        visited.add(currentNode)
 
     return None
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    stack = []
+    queue = util.Queue()
     visited = set()
 
-    stack.append(problem.getStartState())
+    queue.push((problem.getStartState(), []))
 
-    directions = [[]]
-    while len(stack) > 0:
-        currentNode = stack.pop(0)
-        currentList = directions.pop(0)
+    while not queue.isEmpty():
+        currentState = queue.pop()
+        currentNode, currentList = currentState
+        if problem.isGoalState(currentNode):
+            return currentList
+        
+        if currentNode in visited:
+            continue
+          
+        visited.add(currentNode)
+        successors = problem.getSuccessors(currentNode)
+
+        for successor in successors:
+            if successor[0] not in visited:
+                nextList = currentList[:]
+                nextList.append(successor[1])
+                queue.push((successor[0], nextList))
+
+
+    return None
+
+def uniformCostSearch(problem):
+    """Search the node of least total cost first."""
+    "*** YOUR CODE HERE ***"
+    priority_queue = util.PriorityQueue()
+    visited = set()
+
+    priority_queue.push((problem.getStartState(), [], 0), 0)
+
+    while not priority_queue.isEmpty():
+        currentState = priority_queue.pop()
+        currentNode, currentList, currentDistance = currentState
+        
         if problem.isGoalState(currentNode):
             return currentList
         
@@ -135,19 +163,16 @@ def breadthFirstSearch(problem):
         successors = problem.getSuccessors(currentNode)
 
         for successor in successors:
+            nextDistance = currentDistance + successor[2]
+            
             nextList = currentList[:]
             nextList.append(successor[1])
-            directions.append(nextList)
-            stack.append(successor[0])
+
+            priority_queue.push((successor[0], nextList, nextDistance), nextDistance)
 
         visited.add(currentNode)
 
     return None
-
-def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -159,7 +184,33 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    calculateAStarDistance = lambda item: item[2] + heuristic(item[0], problem)
+    priority_queue = util.PriorityQueueWithFunction(calculateAStarDistance)
+    visited = set()
+
+    priority_queue.push((problem.getStartState(), [], 0))
+
+    while not priority_queue.isEmpty():
+        currentState = priority_queue.pop()
+        currentNode, currentList, currentDistance = currentState
+        
+        if problem.isGoalState(currentNode):
+            return currentList
+        
+        if currentNode in visited:
+            continue
+
+        successors = problem.getSuccessors(currentNode)
+
+        for successor in successors:
+            nextDistance = currentDistance + successor[2]
+            
+            nextList = currentList[:]
+            nextList.append(successor[1])
+
+            priority_queue.push((successor[0], nextList, nextDistance))
+
+        visited.add(currentNode)
 
 
 # Abbreviations
