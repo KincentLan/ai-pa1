@@ -262,10 +262,6 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
 
-#####################################################
-# This portion is incomplete.  Time to write code!  #
-#####################################################
-
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
@@ -287,6 +283,7 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
+
         "*** YOUR CODE HERE ***"
 
     def getStartState(self):
@@ -294,15 +291,24 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        corners = [self.startingPosition]
+
+        for corner in self.corners:
+            corners.append(self.startingPosition == corner)
+        
+        return tuple(corners)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        corners = state[1:]
+
+        for corner in corners:
+            if not corner:
+                return False
+        
+        return True
 
     def getSuccessors(self, state):
         """
@@ -323,8 +329,19 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
-
-            "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            corners = state[1:]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            if not self.walls[nextx][nexty]:
+                nextState = [(nextx, nexty)]
+                for i, corner in enumerate(self.corners):
+                    if (nextx, nexty) == corner:
+                        nextState.append(True)
+                    else:
+                        nextState.append(corners[i])
+                    
+                successors.append( ( tuple(nextState), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -359,8 +376,17 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    distances = []
+    for i, visitedCorner in enumerate(state[1:]):
+        if not visitedCorner:
+            xy1 = state[0]
+            xy2 = corners[i]
+            distance = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+            distances.append(distance)
+    
+    print(walls)
+    
+    return min(distances) if len(distances) != 0 else 0
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
