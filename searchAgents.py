@@ -284,8 +284,6 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
 
-        "*** YOUR CODE HERE ***"
-
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -383,10 +381,8 @@ def cornersHeuristic(state, problem):
             xy2 = corners[i]
             distance = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
             distances.append(distance)
-    
-    print(walls)
-    
-    return min(distances) if len(distances) != 0 else 0
+        
+    return min(distances) if distances else 0
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
