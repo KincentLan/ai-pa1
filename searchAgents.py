@@ -382,7 +382,7 @@ def cornersHeuristic(state, problem):
             distance = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
             distances.append(distance)
         
-    return min(distances) if distances else 0
+    return max(distances) if distances else 0
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
