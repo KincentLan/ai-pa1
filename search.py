@@ -172,6 +172,39 @@ def uniformCostSearch(problem):
 
     return None
 
+def greedyCostSearch(problem):
+    """Search the node cloest to the goal node first."""
+    priority_queue = util.PriorityQueue()
+    visited = set()
+
+    priority_queue.push((problem.getStartState(), []), 0)
+
+    while not priority_queue.isEmpty():
+        currentState = priority_queue.pop()
+        currentNode, currentList = currentState
+        
+        if problem.isGoalState(currentNode):
+            return currentList
+        
+        if currentNode in visited:
+            continue
+
+        successors = problem.getSuccessors(currentNode)
+
+        for successor in successors:
+            nextList = currentList[:]
+            nextList.append(successor[1])
+
+            xy1 = successor[0]
+            xy2 = problem.goal
+            distance = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+            
+            priority_queue.push((successor[0], nextList), distance)
+
+        visited.add(currentNode)
+
+    return None
+
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
